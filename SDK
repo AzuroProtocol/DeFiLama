@@ -1,0 +1,31 @@
+const sdk = require('@defillama/sdk');
+const { transformBscAddress } = require('../helper/portedTokens');
+const AZURO_TOKEN_CONTRACT = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d';
+const AZURO_CORE_CONTRACT = '0x4fE6A9e47db94a9b2a4FfeDE8db1602FD1fdd37d';
+
+async function tvl(timestamp, block, chainBlocks) {
+  const balances = {};
+  const transform = await transformBscAddress();
+
+  const collateralBalance = (await sdk.api.abi.call({
+    abi: 'erc20:balanceOf',
+    chain: 'xDai',
+    target: AZURO_TOKEN_CONTRACT,
+    params: [AZURO_CORE_CONTRACT],
+    block: chainBlocks['xDai'],
+  })).output;
+
+  await sdk.util.sumSingleBalance(balances, transform(AZURO_TOKEN_CONTRACT), collateralBalance)
+
+  return balances;
+}
+
+module.exports = {
+  timetravel: true,
+  misrepresentedTokens: false,
+  methodology: 'counts the number of MINT tokens in the Club Bonding contract.',
+  start: 1000235,
+  bsc: {
+    tvl,
+  }
+}; 
