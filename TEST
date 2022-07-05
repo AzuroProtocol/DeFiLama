@@ -1,0 +1,3 @@
+$ npm install
+# Replace with your adapter's name
+$ node test.js projects/SDK/index.js 
